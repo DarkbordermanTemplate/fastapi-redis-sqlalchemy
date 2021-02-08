@@ -2,6 +2,7 @@ import pytest
 
 from tests import AssertRequest, AssertResponse, assert_request
 from cache import init_cache
+from model import init_db
 
 ROUTE = "/fruit"
 
@@ -18,6 +19,7 @@ GET_OUTPUT = {
 
 @pytest.mark.parametrize("test_type", GET_INPUT.keys())
 def test_get(test_type):
+    init_db()
     init_cache()
     assert_request("GET", ROUTE, GET_INPUT[test_type], GET_OUTPUT[test_type])
 
@@ -32,6 +34,7 @@ GET_URL_OUTPUT = {
 
 @pytest.mark.parametrize("test_type", GET_URL_INPUT.keys())
 def test_get_url(test_type):
+    init_db()
     init_cache()
     assert_request(
         "GET",
@@ -56,5 +59,6 @@ POST_OUTPUT = {
 
 @pytest.mark.parametrize("test_type", POST_INPUT.keys())
 def test_post(test_type):
+    init_db()
     init_cache()
     assert_request("POST", ROUTE, POST_INPUT[test_type], POST_OUTPUT[test_type])

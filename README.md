@@ -1,7 +1,8 @@
-# FastAPI-redis
-Fastapi framework template, with basic redis operations.
+# FastAPI-redis-sqlalchemy
+Fastapi framework template, with basic sqlalchemy operations and using redis as cache.
 
-![Integration](https://github.com/DarkbordermanTemplate/fastapi-redis/workflows/Integration/badge.svg)
+![Integration](https://github.com/DarkbordermanTemplate/fastapi-redis-sqlalchemy/workflows/Integration/badge.svg)
+![Build](https://github.com/DarkbordermanTemplate/fastapi-redis-sqlalchemy/workflows/Build/badge.svg)
 
 ## Development
 

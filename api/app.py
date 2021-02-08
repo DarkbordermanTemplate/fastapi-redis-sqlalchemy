@@ -3,10 +3,10 @@ from fastapi.requests import Request
 from fastapi.responses import Response
 from loguru import logger
 
-from model import init_db
 from cache import init_cache
 from config import Config
 from endpoints import RESOURCES
+from model import init_db
 
 APP = FastAPI(
     version=Config.VERSION,

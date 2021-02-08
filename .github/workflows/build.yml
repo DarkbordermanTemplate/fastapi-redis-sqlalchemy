@@ -1,0 +1,14 @@
+name: Build
+
+on: push
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build docker image
+      run: |
+        cp sample.env .env
+        docker-compose build

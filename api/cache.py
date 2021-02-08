@@ -1,6 +1,10 @@
+from typing import List
+
 from redis import StrictRedis
 
 from config import Config
+from db import SESSION
+from model import Fruit
 
 REDIS: StrictRedis = StrictRedis(
     host=Config.REDIS_HOST,
@@ -11,4 +15,6 @@ REDIS: StrictRedis = StrictRedis(
 
 
 def init_cache():
-    REDIS.set("apple", f"{1}")
+    fruits: List[Fruit] = SESSION.query(Fruit).all()
+    for fruit in fruits:
+        REDIS.set(fruit.name, f"{fruit.count}")

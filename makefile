@@ -1,8 +1,13 @@
 .PHONY: clean init
 
 init: clean
-	pipenv --python 3.7
 	pipenv install --dev
+
+service_up:
+	docker-compose run -d database && docker-compose run -d redis
+
+service_down:
+	docker-compose down && docker volume rm database_data
 
 lint: pylint flake8
 
