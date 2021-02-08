@@ -1,0 +1,45 @@
+# This workflow will install Python dependencies, run tests and lint with a single version of Python
+# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
+
+name: Integration
+
+on: push
+
+jobs:
+  integration:
+
+    runs-on: ubuntu-latest
+    container: python:3.7.7-slim
+
+    services:
+      redis:
+        image: redis
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_DB: database
+          POSTGRES_HOST_AUTH_METHOD: trust
+          POSTGRES_PASSWORD: password
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.7
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.7
+    - name: Install dependencies
+      run: |
+        apt update && apt install -y make redis-tools postgresql-client
+        python -m pip install --upgrade pip
+        pip install pipenv
+        redis-cli -h redis CONFIG SET requirepass "password"
+        make
+    - name: Create database schema
+      run: |
+        psql -f "sql/table.sql" postgresql://postgres:password@postgres:5432/database
+    - name: Run ci bundle command
+      run: |
+        make ci-bundle
+      env:
+        REDIS_HOST: redis
+        DB_URL: postgresql://postgres:password@postgres:5432/database

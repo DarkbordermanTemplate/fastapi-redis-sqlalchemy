@@ -1,0 +1,12 @@
+version: '3.4'
+
+services:
+  fastapi-template:
+    container_name: fastapi-template
+    build: .
+    image: fastapi-template:latest
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - 8000:8000

@@ -1,0 +1,4 @@
+CREATE TABLE IF NOT EXISTS fruit(
+    name VARCHAR PRIMARY KEY,
+    count INTEGER NOT NULL
+);
