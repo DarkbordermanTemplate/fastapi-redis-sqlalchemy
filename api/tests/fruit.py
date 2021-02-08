@@ -1,60 +1,39 @@
 import pytest
-
-from tests import AssertRequest, AssertResponse, assert_request
-from cache import init_cache
+from tests import APITestcase, AssertRequest, AssertResponse
 
 ROUTE = "/fruit"
 
-GET_INPUT = {
-    "success": AssertRequest({}, {"name": "apple"}),
-    "fail": AssertRequest({}, {"name": "banana"}),
-}
-
-GET_OUTPUT = {
-    "success": AssertResponse({"name": "apple", "count": 1}, 200),
-    "fail": AssertResponse("Bad Request", 400),
-}
-
-
-@pytest.mark.parametrize("test_type", GET_INPUT.keys())
-def test_get(test_type):
-    init_cache()
-    assert_request("GET", ROUTE, GET_INPUT[test_type], GET_OUTPUT[test_type])
-
-
-GET_URL_INPUT = {"success": "/apple", "fail": "/banana"}
-
-GET_URL_OUTPUT = {
-    "success": AssertResponse({"name": "apple", "count": 1}, 200),
-    "fail": AssertResponse("Bad Request", 400),
-}
-
-
-@pytest.mark.parametrize("test_type", GET_URL_INPUT.keys())
-def test_get_url(test_type):
-    init_cache()
-    assert_request(
-        "GET",
-        ROUTE + GET_URL_INPUT[test_type],
-        AssertRequest({}, {}),
-        GET_URL_OUTPUT[test_type],
-    )
-
-
 HEADERS = {"Content-Type": "Application/json"}
 
-POST_INPUT = {
-    "success": AssertRequest(HEADERS, {"name": "banana"}),
-    "fail": AssertRequest(HEADERS, {"name": "apple"}),
-}
+CASES = [
+    APITestcase(
+        "ok",
+        AssertRequest("GET", ROUTE, {}, {"name": "apple"}),
+        AssertResponse({"name": "apple", "count": 1}, 200),
+    ),
+    APITestcase(
+        "bad_request",
+        AssertRequest("GET", ROUTE, {}, {"name": "banana"}),
+        AssertResponse("Bad Request", 400),
+    ),
+    APITestcase(
+        "internal_server_error",
+        AssertRequest("GET", ROUTE, {}, {"name": "error"}),
+        AssertResponse("Internal Server Error", 500),
+    ),
+    APITestcase(
+        "ok",
+        AssertRequest("POST", ROUTE, HEADERS, None, {"name": "banana"}),
+        AssertResponse("OK", 200),
+    ),
+    APITestcase(
+        "fail",
+        AssertRequest("POST", ROUTE, HEADERS, None, {"name": "apple"}),
+        AssertResponse("Bad Request", 400),
+    ),
+]
 
-POST_OUTPUT = {
-    "success": AssertResponse("OK", 200),
-    "fail": AssertResponse("Bad Request", 400),
-}
 
-
-@pytest.mark.parametrize("test_type", POST_INPUT.keys())
-def test_post(test_type):
-    init_cache()
-    assert_request("POST", ROUTE, POST_INPUT[test_type], POST_OUTPUT[test_type])
+@pytest.mark.parametrize("case", CASES, ids=[case.name for case in CASES])
+def test(case: APITestcase):
+    case.run()

@@ -1,26 +1,27 @@
+from cache import init_cache
+from config import Config
+from endpoints import RESOURCES
 from fastapi import APIRouter, Depends, FastAPI
 from fastapi.requests import Request
 from fastapi.responses import Response
 from loguru import logger
-
-from model import init_db
-from cache import init_cache
-from config import Config
-from endpoints import RESOURCES
+from models import init_db
 
 APP = FastAPI(
     version=Config.VERSION,
     title=Config.APP_TITLE,
     description=Config.APP_DESCRIPTION,
-    openapi_url=Config.OPENAPI_URL
+    openapi_url=Config.OPENAPI_URL,
 )
 API_ROUTER = APIRouter()
 
 
 # Logs incoming request information
 async def log_request(request: Request):
-    logger.info(f'[{request.client.host}:{request.client.host}] {request.method} {request.url}')
-    logger.info(f'header: {request.headers}, body: ')
+    logger.info(
+        f"[{request.client.host}:{request.client.host}] {request.method} {request.url}"
+    )
+    logger.info(f"header: {request.headers}, body: ")
     logger.info(await request.body())
 
 
@@ -40,13 +41,13 @@ async def log_response(request: Request, call_next):
     async for chunk in response.body_iterator:
         body += chunk
 
-    logger.info(f'{response.status_code} {body}')
+    logger.info(f"{response.status_code} {body.decode()}")
 
     return Response(
         content=body,
         status_code=response.status_code,
         headers=dict(response.headers),
-        media_type=response.media_type
+        media_type=response.media_type,
     )
 
 

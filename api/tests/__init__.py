@@ -1,11 +1,8 @@
-"""Testing module"""
 from dataclasses import dataclass
-from typing import Any, Union
-
-from fastapi.testclient import TestClient
+from typing import Union
 
 from app import APP
-
+from fastapi.testclient import TestClient
 
 CLIENT = TestClient(APP)
 
@@ -13,54 +10,68 @@ CLIENT = TestClient(APP)
 @dataclass
 class AssertRequest:
     """
-    API request assertion dataclass
+    API request assertion class
 
-    headers (Union[dict, None]): The expected headers of request
-    payload (Union[dict, None]): The expceted payload(json or GET parameters) of request
+    Attributes:
+        method (str): HTTP method of request
+        url (str): HTTP url of request
+        headers (Union[dict, None]): Headers of request
+        params (Union[dict, None]): Parameters of request (for GET)
+        json (Union[dict, None]): JSON payload of request (for POST, PUT, DELETE)
     """
 
-    headers: Union[dict, None]
-    payload: Union[dict, None]
+    method: str
+    url: str
+    headers: Union[dict, None] = None
+    params: Union[dict, None] = None
+    json: Union[dict, None] = None
 
 
 @dataclass
 class AssertResponse:
     """
-    API response assertion dataclass
+    API response assertion class
 
-    body (Any): The expected body of response
-    status_code (int): The expected status code of response
+    Attributes:
+        body (Union[dict, str]): The expected body of response
+        status_code (int): The expected status code of response
     """
 
-    body: Any = "OK"
-    status_code: int = 200
+    body: Union[dict, str]
+    status_code: int
 
 
-def assert_request(
-    method: str, route: str, request: AssertRequest, response: AssertResponse
-):
-    if method.upper() == "GET":
+@dataclass
+class APITestcase:
+    """
+    API testcase assertion class
+
+    Attributes:
+        name (str): Test case's name
+        request (AssertRequest): Asserted Request
+        response (AssertResponse): Asserted Response
+    """
+
+    name: str
+    request: AssertRequest
+    response: AssertResponse
+
+    def run(self):
         resp = CLIENT.request(
-            method,
-            f"{route}",
-            headers=request.headers,
-            params=request.payload,
+            self.request.method,
+            self.request.url,
+            headers=self.request.headers,
+            params=self.request.params,
+            json=self.request.json,
         )
-    else:
-        resp = CLIENT.request(
-            method,
-            f"{route}",
-            headers=request.headers,
-            json=request.payload,
-        )
-
-    try:
+        if isinstance(self.response.body, str):
+            assert (
+                resp.text == self.response.body
+            ), f"{resp.text} does not match {self.response.body}"
+        else:
+            assert (
+                resp.json() == self.response.body
+            ), f"{resp.json} does not match {self.response.body}"
         assert (
-            resp.json() == response.body
-        ), f"{resp.json} does not match {response.body}"
-    except Exception:
-        assert resp.text == response.body, f"{resp.body} does not match {response.body}"
-
-    assert (
-        resp.status_code == response.status_code
-    ), f"{resp.status_code} does not match {response.status_code}"
+            resp.status_code == self.response.status_code
+        ), f"{resp.status_code} does not match {self.response.status_code}"

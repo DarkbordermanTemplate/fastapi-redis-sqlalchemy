@@ -1,15 +1,11 @@
-# This workflow will install Python dependencies, run tests and lint with a single version of Python
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
-
 name: Integration
 
 on: push
 
 jobs:
   integration:
-
-    runs-on: ubuntu-latest
-    container: python:3.7.7-slim
+    runs-on: ubuntu-18.04
+    container: python:3.8.9-slim
 
     services:
       redis:
@@ -22,14 +18,20 @@ jobs:
           POSTGRES_PASSWORD: password
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python 3.7
+    - name: Install Ubuntu dependencies
+      run: |
+        apt-get update
+        apt-get install -y make redis-tools postgresql-client software-properties-common gnupg2
+        add-apt-repository -y ppa:git-core/ppa
+        apt-get install -y git
+    - name: Repository checkout
+      uses: actions/checkout@v2
+    - name: Set up Python 3.8
       uses: actions/setup-python@v2
       with:
-        python-version: 3.7
-    - name: Install dependencies
+        python-version: 3.8
+    - name: Install service dependencies
       run: |
-        apt update && apt install -y make redis-tools postgresql-client
         python -m pip install --upgrade pip
         pip install pipenv
         redis-cli -h redis CONFIG SET requirepass "password"
@@ -41,5 +43,5 @@ jobs:
       run: |
         make ci-bundle
       env:
-        REDIS_HOST: redis
+        REDIS_URL: redis://:password@redis:6379/0
         DB_URL: postgresql://postgres:password@postgres:5432/database

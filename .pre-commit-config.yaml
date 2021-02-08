@@ -1,0 +1,22 @@
+repos:
+  - repo: local
+    hooks:
+    - id: analysis
+      name: Code analysis
+      entry: make analysis
+      language: system
+      always_run: true
+  - repo: local
+    hooks:
+    - id: reformat
+      name: Code reformat
+      entry: make reformat
+      language: system
+      always_run: true
+  - repo: local
+    hooks:
+    - id: lint
+      name: Code lint
+      entry: make lint
+      language: system
+      always_run: true

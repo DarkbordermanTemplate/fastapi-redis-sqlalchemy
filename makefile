@@ -1,31 +1,43 @@
 .PHONY: clean init
 
 init: clean
-	pipenv --python 3.7
 	pipenv install --dev
+	pipenv run pre-commit install
 
-lint: pylint flake8
+service_up:
+	docker-compose up -d postgres redis
 
-flake8:
-	pipenv run flake8 api/ --max-line-length=120 --exclude=test,database
+service_down:
+	docker-compose down && docker volume rm postgres_data redis_data
 
-pylint:
-	pipenv run pylint --rcfile=setup.cfg api/
+analysis: bandit mypy
 
-reformat: black isort
+bandit:
+	pipenv run bandit api/
+
+mypy:
+	pipenv run mypy api/
+
+reformat: isort black
 
 black:
-	pipenv run black api/endpoints/
-	pipenv run black api/tests/
+	pipenv run black api/
 
 isort:
-	pipenv run isort api/*.py
-	pipenv run isort api/endpoints/**/*.py
+	pipenv run isort .
 
-ci-bundle: reformat lint test
+lint: flake8 pylint
+
+flake8:
+	pipenv run flake8 api/ --max-line-length=120
+
+pylint:
+	pipenv run pylint --rcfile=setup.cfg api/*
 
 test:
 	pipenv run pytest -vv --cov-report=term-missing --cov=api/endpoints api/tests
+
+ci-bundle: analysis reformat lint test
 
 clean:
 	find . -type f -name '*.py[co]' -delete

@@ -1,12 +1,42 @@
 version: '3.4'
 
 services:
-  fastapi-template:
-    container_name: fastapi-template
+  api:
     build: .
+    container_name: fastapi-template
     image: fastapi-template:latest
     restart: always
     env_file:
       - .env
     ports:
       - 8000:8000
+
+  postgres:
+    container_name: postgres
+    image: postgres:11
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_DB: database
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    volumes:
+      - ./sql/table.sql:/docker-entrypoint-initdb.d/table.sql
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    container_name: redis
+    image: redis:latest
+    restart: always
+    ports:
+      - 6379:6379
+    command: redis-server --appendonly yes --requirepass password
+    volumes:
+      - redis_data:/data
+
+volumes:
+  postgres_data:
+    name: postgres_data
+  redis_data:
+    name: redis_data

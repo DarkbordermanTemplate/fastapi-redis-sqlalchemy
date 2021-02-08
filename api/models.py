@@ -1,12 +1,26 @@
+from db import SESSION
 from sqlalchemy import INT, VARCHAR, Column
 from sqlalchemy.ext.declarative import declarative_base
-
-from db import SESSION
 
 BASE = declarative_base()
 
 
-class Fruit(BASE):
+class ModelMixin:
+    """A class that implements some operation methods for inherence"""
+
+    @staticmethod
+    def commit():
+        SESSION.commit()
+
+    @classmethod
+    def query(cls):
+        return SESSION.query(cls)
+
+    def add(self):
+        SESSION.add(self)
+
+
+class Fruit(BASE, ModelMixin):  # type: ignore
 
     __tablename__ = "fruit"
 

@@ -1,14 +1,13 @@
-from redis import StrictRedis
+from typing import List
 
 from config import Config
+from models import Fruit
+from redis import StrictRedis
 
-REDIS: StrictRedis = StrictRedis(
-    host=Config.REDIS_HOST,
-    port=Config.REDIS_PORT,
-    db=Config.REDIS_DB_IDX,
-    password=Config.REDIS_PASSWORD,
-)
+REDIS: StrictRedis = StrictRedis.from_url(Config.REDIS_URL)
 
 
 def init_cache():
-    REDIS.set("apple", f"{1}")
+    fruits: List[Fruit] = Fruit.query().all()
+    for fruit in fruits:
+        REDIS.set(fruit.name, f"{fruit.count}")
