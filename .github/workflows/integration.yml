@@ -22,7 +22,7 @@ jobs:
       run: |
         apt-get update
         apt-get install -y make redis-tools postgresql-client software-properties-common
-        apt-get add-apt-repository -y ppa:git-core/ppa
+        add-apt-repository -y ppa:git-core/ppa
         apt-get update
         apt-get install -y git
     - uses: actions/checkout@v2
