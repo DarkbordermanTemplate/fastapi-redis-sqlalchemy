@@ -18,6 +18,13 @@ jobs:
           POSTGRES_PASSWORD: password
 
     steps:
+    - name: Install ubuntu dependencies
+      run: |
+        apt update
+        apt install -y make redis-tools postgresql-client software-properties-common
+        apt add-apt-repository -y ppa:git-core/ppa
+        apt update
+        apt install -y git
     - uses: actions/checkout@v2
     - name: Set up Python 3.8
       uses: actions/setup-python@v2
