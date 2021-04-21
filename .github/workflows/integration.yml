@@ -21,10 +21,10 @@ jobs:
     - name: Install ubuntu dependencies
       run: |
         apt-get update
+        apt-key adv --keyserver keyserver.ubuntu.com --recv-keys A1715D88E1DF1F24
         apt-get install -y make redis-tools postgresql-client software-properties-common
         apt-get update
         add-apt-repository -y ppa:git-core/ppa
-        apt-get update --allow-unauthenticated
         apt-get install -y git
     - uses: actions/checkout@v2
     - name: Set up Python 3.8
