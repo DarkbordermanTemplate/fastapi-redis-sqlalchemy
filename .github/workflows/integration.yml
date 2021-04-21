@@ -21,8 +21,7 @@ jobs:
     - name: Install ubuntu dependencies
       run: |
         apt-get update
-        apt-key adv --keyserver keyserver.ubuntu.com --recv-keys A1715D88E1DF1F24
-        apt-get install -y make redis-tools postgresql-client software-properties-common
+        apt-get install -y make redis-tools postgresql-client software-properties-common gnupg
         apt-get update
         add-apt-repository -y ppa:git-core/ppa
         apt-get install -y git
