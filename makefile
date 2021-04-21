@@ -2,6 +2,7 @@
 
 init: clean
 	pipenv install --dev
+	pipenv run pre-commit install
 
 service_up:
 	docker-compose run -d database && docker-compose run -d redis
