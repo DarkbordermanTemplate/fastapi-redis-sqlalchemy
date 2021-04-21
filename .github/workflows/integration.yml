@@ -21,7 +21,7 @@ jobs:
     - name: Install ubuntu dependencies
       run: |
         apt-get update
-        apt-get install -y make redis-tools postgresql-client software-properties-common gnupg
+        apt-get install -y make redis-tools postgresql-client software-properties-common gnupg2
         apt-get update
         add-apt-repository -y ppa:git-core/ppa
         apt-get install -y git
